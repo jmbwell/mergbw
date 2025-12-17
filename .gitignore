@@ -1,0 +1,9 @@
+
+# Ignore decompiled directories
+decompiled_mergbw/
+MeRGBW_decompiled/
+jadx/
+
+# Ignore python cache
+__pycache__/
+*.pyc

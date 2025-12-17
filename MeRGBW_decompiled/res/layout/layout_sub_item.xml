@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <FrameLayout android:layout_width="66.0dip" android:layout_height="66.0dip">
-        <com.mergbw.core.ui.views.SubItemView android:id="@id/view_sub" android:layout_width="fill_parent" android:layout_height="fill_parent" />
-        <CheckBox android:layout_gravity="center" android:layout_width="25.0dip" android:layout_height="25.0dip" />
-    </FrameLayout>
-</LinearLayout>

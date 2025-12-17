@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical" android:background="@mipmap/bg_main" android:layout_width="match_parent" android:layout_height="match_parent">
-    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/layout_head" android:layout_width="match_parent" android:layout_height="44dp">
-        <ImageView android:id="@+id/iv_back" android:layout_width="36dp" android:layout_height="36dp" android:src="@mipmap/icon_back" android:layout_marginStart="12dp" app:layout_constraintBottom_toBottomOf="0" app:layout_constraintStart_toStartOf="0" app:layout_constraintTop_toTopOf="0"/>
-        <TextView android:textSize="18sp" android:textColor="@color/white" android:ellipsize="end" android:id="@+id/tv_title" android:layout_width="0dp" android:layout_height="wrap_content" android:maxLines="1" android:layout_centerInParent="true" android:alpha="0.9" android:layout_marginStart="5dp" android:layout_marginEnd="20dp" android:autoSizeTextType="uniform" android:autoSizeStepGranularity="1sp" android:autoSizeMinTextSize="14sp" android:autoSizeMaxTextSize="18sp" app:layout_constraintBottom_toBottomOf="0" app:layout_constraintEnd_toEndOf="0" app:layout_constraintStart_toEndOf="@+id/iv_back" app:layout_constraintTop_toTopOf="0"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <ProgressBar android:id="@+id/web_progress" android:layout_width="match_parent" android:layout_height="3dp" android:max="100" android:indeterminateOnly="false" android:progressDrawable="@drawable/seekbar_style" style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
-    <WebView android:id="@+id/web_view" android:layout_width="match_parent" android:layout_height="match_parent"/>
-</LinearLayout>

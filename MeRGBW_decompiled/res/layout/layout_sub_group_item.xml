@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:orientation="vertical" android:background="@drawable/bg_group_item_solid" android:layout_width="fill_parent" android:layout_height="92.0dip" android:layout_marginTop="15.0dip"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <TextView android:textSize="15.0sp" android:textColor="@color/white" android:gravity="center_vertical" android:id="@id/group_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:alpha="0.7" android:layout_marginStart="15.0dip" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
-    <CheckBox android:id="@id/cb_selected" android:background="@drawable/icon_checkbox" android:visibility="invisible" android:layout_width="25.0dip" android:layout_height="25.0dip" android:layout_marginTop="7.5dip" android:button="@null" android:layout_marginEnd="10.5dip" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
-    <com.mergbw.core.ui.views.GradientView android:id="@id/view_sub_group" android:layout_width="fill_parent" android:layout_height="51.0dip" app:layout_constraintBottom_toBottomOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>

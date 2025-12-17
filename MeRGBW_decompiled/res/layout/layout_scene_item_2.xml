@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginStart="15.0dip"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:textSize="14.0sp" android:textColor="@color/white" android:ellipsize="end" android:gravity="center_vertical" android:id="@id/tv_item_name" android:layout_width="fill_parent" android:layout_height="48.0dip" android:text="幻彩" android:maxLines="2" android:paddingStart="20.0dip" android:autoSizeTextType="uniform" android:autoSizeStepGranularity="1.0sp" android:autoSizeMinTextSize="12.0sp" android:autoSizeMaxTextSize="14.0sp" />
-</LinearLayout>

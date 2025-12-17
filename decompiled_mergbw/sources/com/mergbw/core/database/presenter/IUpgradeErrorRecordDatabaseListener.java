@@ -1,8 +1,0 @@
-package com.mergbw.core.database.presenter;
-
-import com.mergbw.core.database.bean.UpgradeErrorRecordBean;
-import java.util.List;
-/* loaded from: classes4.dex */
-public interface IUpgradeErrorRecordDatabaseListener extends IBaseDatabaseListener {
-    void onGetRecordList(List<UpgradeErrorRecordBean> recordList);
-}

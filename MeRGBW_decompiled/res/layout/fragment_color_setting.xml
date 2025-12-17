@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.mergbw.core.ui.views.CustomScrollView android:background="@mipmap/bg_main" android:layout_width="fill_parent" android:layout_height="fill_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
-        <com.mergbw.core.ui.views.CommonColorPickerView android:id="@id/view_common_color_picker" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="20.0dip" app:layout_constraintBottom_toTopOf="@id/btn_save" app:layout_constraintTop_toTopOf="parent" />
-        <Button android:textSize="16.0sp" android:textColor="@color/white" android:id="@id/btn_save" android:background="@drawable/btn_main_bg" android:layout_width="fill_parent" android:layout_height="44.0dip" android:layout_marginLeft="20.0dip" android:layout_marginRight="20.0dip" android:layout_marginBottom="20.0dip" android:text="@string/save_color" android:textAllCaps="false" android:layout_marginHorizontal="20.0dip" app:layout_constraintBottom_toBottomOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.mergbw.core.ui.views.CustomScrollView>

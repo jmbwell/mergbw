@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.recyclerview.widget.RecyclerView android:id="@id/list_scene" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginStart="5.0dip" android:layout_marginEnd="15.0dip" />
-    <androidx.recyclerview.widget.RecyclerView android:id="@id/list_classic_color" android:layout_width="wrap_content" android:layout_height="40.0dip" android:layout_marginTop="15.0dip" android:layout_marginEnd="20.0dip" />
-    <com.mergbw.core.ui.views.LineColorPickerView android:id="@id/view_color_line" android:paddingTop="10.0dip" android:paddingBottom="10.0dip" android:layout_width="fill_parent" android:layout_height="60.0dip" android:layout_marginLeft="10.0dip" android:layout_marginRight="10.0dip" android:layout_marginHorizontal="10.0dip" android:paddingVertical="10.0dip" app:indicatorColor="@color/white" app:indicatorEnable="true" app:orientation="horizontal" />
-</LinearLayout>

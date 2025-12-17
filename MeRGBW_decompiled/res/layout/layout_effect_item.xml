@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:textSize="16.0sp" android:textColor="@color/white" android:gravity="center_vertical" android:id="@id/item_name" android:layout_width="0.0dip" android:layout_height="44.0dip" android:layout_weight="1.0" />
-    <ImageView android:layout_gravity="center_vertical" android:id="@id/item_icon" android:layout_width="25.0dip" android:layout_height="25.0dip" android:src="@mipmap/icon_checked_02" />
-</LinearLayout>

@@ -1,6 +1,0 @@
-package com.google.android.gms.internal.ads;
-/* compiled from: com.google.android.gms:play-services-ads@@24.6.0 */
-/* loaded from: classes3.dex */
-final class zzcob {
-    static final zzcoc zza = new zzcoc();
-}
