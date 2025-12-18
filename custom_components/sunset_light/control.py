@@ -1,12 +1,12 @@
+
 import asyncio
 from bleak import BleakClient, BleakScanner
 
 # UUIDs
 SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
-# Reverting to fff3 for Write, as fff4 is typically Notify.
 CHARACTERISTIC_WRITEABLE = "0000fff3-0000-1000-8000-00805f9b34fb"
 
-# Command codes (for reference/dynamic commands)
+# Command codes
 CMD_POWER_REQ = 0x01
 CMD_SET_COLOR_REQ = 0x03
 CMD_SET_BRIGHTNESS_REQ = 0x05
@@ -14,12 +14,11 @@ CMD_WHITE_OFF = 0x00
 CMD_SET_SCENE = 0x06
 
 # Command structure constants
-CMD_HEAD = 0x56
+CMD_HEAD = 0x55
 CMD_SEQUENCE = 0xFF
 
 def build_command(cmd_code: int, value: bytes = b'') -> bytes:
-    """Builds a full command packet using standard structure.
-    Note: Checksum algorithm is best-guess. Use raw packets where possible."""
+    """Builds a full command packet."""
     total_length = 5 + len(value)
     data_for_checksum = bytearray([CMD_HEAD, cmd_code, CMD_SEQUENCE, total_length]) + value
     
@@ -47,67 +46,55 @@ async def send_command(device, command: bytes):
 
 async def turn_on(device):
     """Turns the light on."""
-    # Observed 'On' command: 5601FF0600EB
-    command = bytes.fromhex('5601FF0600EB')
+    # Cmd 01 Data 01
+    command = build_command(CMD_POWER_REQ, b'\x01')
     await send_command(device, command)
 
 async def turn_off(device):
     """Turns the light off."""
-    # Observed 'Off' command: 5600FF0F0064000000000000000028
-    command = bytes.fromhex('5600FF0F0064000000000000000028')
+    # Cmd 01 Data 00
+    command = build_command(CMD_POWER_REQ, b'\x00')
     await send_command(device, command)
 
 async def set_white(device):
     """Sets the light to white."""
-    # Observed 'White' command: 5600FF0F01640000000000000000A7
-    command = bytes.fromhex('5600FF0F01640000000000000000A7')
+    # Cmd 03 RGB 255,255,255
+    command = build_command(CMD_SET_COLOR_REQ, bytes([255, 255, 255]))
     await send_command(device, command)
 
-# Scene Mapping using FULL PACKETS (excluding checksum if possible, or just raw)
-# Since I suspect the mapping logic, I will use the raw hex strings captured.
-# If I don't have a raw string for a specific scene, I will fallback to build_command.
-# Based on XML:
-SCENE_MAPPING = {
-    "fantasy": bytes.fromhex('5603FF060069'),
-    "sunset": bytes.fromhex('5606FF0600E6'),
-    "forest": bytes.fromhex('5606FF0600E6'),
-    "ghost": bytes.fromhex('5606FF060066'),
-    "sunrise": bytes.fromhex('5606FF060047'),
-    "midsummer": bytes.fromhex('5606FF0600E6'),
-    "tropicaltwilight": bytes.fromhex('5606FF0600E6'),
-    "green prairie": bytes.fromhex('5603FF060069'),
-    "rubyglow": bytes.fromhex('5603FF060069'),
-    "aurora": bytes.fromhex('5603FF0600E9'),
-    "savanah": bytes.fromhex('5606FF060066'),
-    "alarm": bytes.fromhex('5606FF0600E6'),
-    "lake placid": bytes.fromhex('5603FF060069'),
-    "neon": bytes.fromhex('5606FF0600E6'),
-    "sundowner": bytes.fromhex('5606FF060066'),
-    "bluestar": bytes.fromhex('5603FF060069'),
-    "redrose": bytes.fromhex('5603FF0600E9'),
-    "rating": bytes.fromhex('5603FF060069'),
-    "disco": bytes.fromhex('5606FF060066'),
-    "autumn": bytes.fromhex('5606FF0600E6'),
-}
+# Scene ID Mapping
+# Verified by scene_hunt.py: IDs 0x80 to 0x94 work with Cmd 06.
+# Mapping based on user provided list order.
+SCENE_NAMES = [
+    "fantasy", "sunset", "forest", "ghost", "sunrise", 
+    "midsummer", "tropicaltwilight", "green prairie", "rubyglow", 
+    "aurora", "savanah", "alarm", "lake placid", "neon", 
+    "sundowner", "bluestar", "redrose", "rating", "disco", "autumn"
+]
+
+SCENE_PARAMS = {}
+start_id = 0x80
+for i, name in enumerate(SCENE_NAMES):
+    SCENE_PARAMS[name] = (CMD_SET_SCENE, bytes([start_id + i]))
 
 async def set_scene(device, scene_name: str):
     """Sets a predefined scene."""
-    command = SCENE_MAPPING.get(scene_name.lower())
-    if command:
+    params = SCENE_PARAMS.get(scene_name.lower())
+    if params:
+        cmd, data = params
+        command = build_command(cmd, data)
         await send_command(device, command)
     else:
         print(f"Unknown scene: {scene_name}")
 
 async def set_color(device, r: int, g: int, b: int):
-    """Sets the color of the light.
-    Note: Using generic build_command, might need adjustment if checksum fails."""
+    """Sets the color of the light."""
     color_value = bytes([r, g, b])
     command = build_command(CMD_SET_COLOR_REQ, color_value)
     await send_command(device, command)
 
 async def set_brightness(device, brightness: int):
-    """Sets the brightness of the light.
-    Note: Using generic build_command."""
+    """Sets the brightness of the light."""
     brightness_value = bytes([brightness])
     command = build_command(CMD_SET_BRIGHTNESS_REQ, brightness_value)
     await send_command(device, command)
