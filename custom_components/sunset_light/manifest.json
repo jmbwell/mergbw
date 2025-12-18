@@ -2,9 +2,9 @@
 {
   "domain": "sunset_light",
   "name": "Sunset Light",
-  "documentation": "https://github.com/your_username/ha-sunset-light-hack",
+  "documentation": "https://github.com/King1704G/ha-sunset-light-hack",
   "dependencies": ["bluetooth"],
-  "codeowners": ["@your_username"],
+  "codeowners": ["@King1704G"],
   "requirements": ["bleak"],
   "version": "0.1.0",
   "config_flow": true
