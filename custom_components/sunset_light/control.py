@@ -1,3 +1,4 @@
+
 import asyncio
 
 # UUIDs
@@ -31,7 +32,6 @@ def build_command(cmd_code: int, value: bytes = b'') -> bytes:
 
 async def send_command(client, command: bytes):
     """Sends a command to the already connected client."""
-    # This now assumes 'client' is a connected BleakClient instance
     print(f"Sending command: {command.hex()}")
     await client.write_gatt_char(CHARACTERISTIC_WRITEABLE, command)
 
@@ -50,17 +50,40 @@ async def set_white(client):
     command = build_command(CMD_SET_COLOR_REQ, bytes([255, 255, 255]))
     await send_command(client, command)
 
-SCENE_NAMES = [
-    "fantasy", "sunset", "forest", "ghost", "sunrise", 
-    "midsummer", "tropicaltwilight", "green prairie", "rubyglow", 
-    "aurora", "savanah", "alarm", "lake placid", "neon", 
-    "sundowner", "bluestar", "redrose", "rating", "disco", "autumn"
-]
+# Scene ID Mapping
+# Explicitly defined based on user verification.
+SCENE_PARAMS = {
+    # Verified Mappings
+    "green prairie": (CMD_SET_SCENE, b'\x81'),
+    "ghost": (CMD_SET_SCENE, b'\x84'),
+    "disco": (CMD_SET_SCENE, b'\x87'),
+    "alarm": (CMD_SET_SCENE, b'\x88'),
+    "savanah": (CMD_SET_SCENE, b'\x8B'),
 
-SCENE_PARAMS = {}
-start_id = 0x80
-for i, name in enumerate(SCENE_NAMES):
-    SCENE_PARAMS[name] = (CMD_SET_SCENE, bytes([start_id + i]))
+    # Default/Unverified Mappings (Sequential from 0x80, skipping verified ones)
+    "fantasy": (CMD_SET_SCENE, b'\x80'),
+    "sunset": (CMD_SET_SCENE, b'\x82'), # Was 81 (GP), moved to 82? No, 82 was Forest.
+    "forest": (CMD_SET_SCENE, b'\x82'),
+    "sunrise": (CMD_SET_SCENE, b'\x83'), # Was 84 (Ghost). 83 was Ghost. Swapped?
+    # Logic: 0x83 is likely Sunrise if 0x84 is Ghost? 
+    "midsummer": (CMD_SET_SCENE, b'\x85'),
+    "tropicaltwilight": (CMD_SET_SCENE, b'\x86'),
+    # 0x87 is Disco.
+    "rubyglow": (CMD_SET_SCENE, b'\x89'), # Was 88 (Alarm). 89 was Aurora.
+    "aurora": (CMD_SET_SCENE, b'\x89'),
+    # 0x8A was Savanah. 0x8B is Savanah. Maybe 0x8A is something else?
+    "lake placid": (CMD_SET_SCENE, b'\x8C'),
+    "neon": (CMD_SET_SCENE, b'\x8D'),
+    "sundowner": (CMD_SET_SCENE, b'\x8E'),
+    "bluestar": (CMD_SET_SCENE, b'\x8F'),
+    "redrose": (CMD_SET_SCENE, b'\x90'),
+    "rating": (CMD_SET_SCENE, b'\x91'),
+    # 0x92 was Disco.
+    "autumn": (CMD_SET_SCENE, b'\x93'),
+}
+
+# Note: Some IDs like 0x8A, 0x92 might be unmapped or map to the "Old" names.
+# Ideally we need to test all IDs again to map the rest.
 
 async def set_scene(client, scene_name: str):
     """Sets a predefined scene."""
