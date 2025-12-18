@@ -12,21 +12,23 @@ from homeassistant.components.light import (
 )
 from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_MAC
+from homeassistant.const import CONF_MAC, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import service, entity_platform
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 
+from bleak_retry_connector import establish_connection, BleakClientWithServiceCache
+
 from .const import DOMAIN
 from . import control
 
 # Service schemas
-SERVICE_SET_SCENE_SCHEMA = vol.Schema({
+SERVICE_SET_SCENE_SCHEMA = cv.make_entity_service_schema({
     vol.Required("scene_name"): cv.string,
 })
 
-SERVICE_SET_WHITE_SCHEMA = vol.Schema({})
+SERVICE_SET_WHITE_SCHEMA = cv.make_entity_service_schema({})
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,7 +39,8 @@ async def async_setup_entry(
 ):
     """Set up the Sunset Light platform."""
     mac_address = config_entry.data[CONF_MAC]
-    async_add_entities([SunsetLight(mac_address, "Sunset Light", hass)])
+    light = SunsetLight(mac_address, "Sunset Light", hass)
+    async_add_entities([light])
 
     platform = entity_platform.async_get_current_platform()
 
@@ -75,6 +78,8 @@ class SunsetLight(LightEntity):
         self._rgb_color = None
         self._effect = None
         self._hass = hass
+        self._client = None
+        self._disconnect_timer = None
 
     @property
     def unique_id(self):
@@ -106,33 +111,56 @@ class SunsetLight(LightEntity):
         """Return the current effect."""
         return self._effect
 
-    def _get_device(self):
-        """Get the BLEDevice object or fallback to MAC."""
+    async def _ensure_connected(self):
+        """Ensure the BleakClient is connected."""
+        if self._client and self._client.is_connected:
+            return self._client
+
         device = bluetooth.async_ble_device_from_address(self._hass, self._mac, connectable=True)
-        return device if device else self._mac
+        if not device:
+            raise Exception(f"Device {self._mac} not found")
+
+        self._client = await establish_connection(
+            BleakClientWithServiceCache,
+            device,
+            self._mac,
+            disconnected_callback=self._on_disconnected,
+        )
+        return self._client
+
+    def _on_disconnected(self, client):
+        """Handle disconnection."""
+        _LOGGER.info("Disconnected from %s", self._mac)
+        self._client = None
+
+    async def async_will_remove_from_hass(self):
+        """Disconnect when removed."""
+        if self._client:
+            await self._client.disconnect()
 
     async def async_turn_on(self, **kwargs):
         """Instruct the light to turn on."""
-        await control.turn_on(self._get_device())
+        client = await self._ensure_connected()
+        await control.turn_on(client)
         self._is_on = True
 
         if ATTR_RGB_COLOR in kwargs:
             r, g, b = kwargs[ATTR_RGB_COLOR]
-            await control.set_color(self._get_device(), r, g, b)
+            await control.set_color(client, r, g, b)
             self._rgb_color = (r, g, b)
-            self._effect = None # Clear effect if color set manually
+            self._effect = None
         elif ATTR_EFFECT in kwargs:
             effect = kwargs[ATTR_EFFECT]
-            await control.set_scene(self._get_device(), effect)
+            await control.set_scene(client, effect)
             self._effect = effect
         else:
-            # Keep current settings/defaults
+            # Default behavior if just toggled on without params
             if self._rgb_color is None and self._effect is None:
                 self._rgb_color = (255, 255, 255)
 
         if ATTR_BRIGHTNESS in kwargs:
             brightness = kwargs[ATTR_BRIGHTNESS]
-            await control.set_brightness(self._get_device(), int(brightness / 255 * 100))
+            await control.set_brightness(client, int(brightness / 255 * 100))
             self._brightness = brightness
         elif self._brightness is None:
              self._brightness = 255
@@ -141,21 +169,22 @@ class SunsetLight(LightEntity):
 
     async def async_turn_off(self, **kwargs):
         """Instruct the light to turn off."""
-        await control.turn_off(self._get_device())
+        client = await self._ensure_connected()
+        await control.turn_off(client)
         self._is_on = False
         self.async_write_ha_state()
 
     async def async_handle_set_scene(self, scene_name: str):
         """Handle the set_scene service call."""
-        _LOGGER.debug("Setting scene %s for %s", scene_name, self._name)
-        await control.set_scene(self._get_device(), scene_name)
+        client = await self._ensure_connected()
+        await control.set_scene(client, scene_name)
         self._effect = scene_name
         self.async_write_ha_state()
 
     async def async_handle_set_white(self):
         """Handle the set_white service call."""
-        _LOGGER.debug("Setting %s to white", self._name)
-        await control.set_white(self._get_device())
+        client = await self._ensure_connected()
+        await control.set_white(client)
         self._rgb_color = (255, 255, 255)
         self._brightness = 255
         self._is_on = True
