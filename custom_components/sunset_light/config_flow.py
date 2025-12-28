@@ -22,7 +22,11 @@ class SunsetLightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         service_uuid = "0000fff0-0000-1000-8000-00805f9b34fb"
         devices = {}
         for info in bluetooth.async_discovered_service_info(self.hass, connectable=True):
-            if service_uuid.lower() not in {s.lower() for s in info.service_uuids}:
+            uuids = {s.lower() for s in info.service_uuids}
+            name = info.name or ""
+            if service_uuid.lower() not in uuids and not any(
+                hint in name.lower() for hint in ("hexagon", "sunset")
+            ):
                 continue
             label = f"{info.name or 'Unknown'} ({info.address})"
             devices[label] = info.address
