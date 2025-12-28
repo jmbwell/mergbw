@@ -6,7 +6,8 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_MAC
 
-from .const import DOMAIN
+from .const import CONF_PROFILE, DEFAULT_PROFILE, DOMAIN
+from .protocol import list_profiles
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,8 +25,12 @@ class SunsetLightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title="Sunset Light", data=user_input)
 
+        profile_options = {key: label for key, label in list_profiles()}
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_MAC): str}),
+            data_schema=vol.Schema({
+                vol.Required(CONF_MAC): str,
+                vol.Required(CONF_PROFILE, default=DEFAULT_PROFILE): vol.In(profile_options),
+            }),
             errors=errors,
         )
