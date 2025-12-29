@@ -118,6 +118,7 @@ class MeRGBWLight(LightEntity):
     _attr_supported_color_modes = {ColorMode.RGB}
     _attr_color_mode = ColorMode.RGB
     _attr_supported_features = LightEntityFeature.EFFECT
+    _attr_icon = "mdi:hexagon-multiple-outline"
 
     def __init__(self, mac, name, hass: HomeAssistant, profile_key: str):
         """Initialize a MeRGBW Light."""
