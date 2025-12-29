@@ -139,6 +139,17 @@ class SunsetLight(LightEntity):
         return self._mac
 
     @property
+    def device_info(self):
+        """Return device registry info."""
+        return {
+            "identifiers": {(DOMAIN, self._mac)},
+            "connections": {("bluetooth", self._mac)},
+            "name": self._name,
+            "manufacturer": "MeRGBW",
+            "model": self._profile.name,
+        }
+
+    @property
     def name(self):
         """Return the display name of this light."""
         return self._name
