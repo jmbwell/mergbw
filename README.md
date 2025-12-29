@@ -1,6 +1,6 @@
 # HA Sunset Light Hack
 
-This repository contains a Home Assistant custom component to control Bluetooth sunset/hexagon lights (MeRGBW variants).
+This project implements a Home Assistant custom component for Bluetooth LE controllable lights that use the MeRGBW App, including the Hexagon Light and Sunset Light available on Amazon.
 
 ## Protocol profiles
 
