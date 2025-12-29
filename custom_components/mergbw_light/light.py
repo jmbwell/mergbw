@@ -70,7 +70,7 @@ async def async_setup_entry(
     )
     platform.async_register_entity_service(
         SERVICE_SET_SCENE_ID,
-        vol.Schema(
+        cv.make_entity_service_schema(
             {
                 vol.Required("scene_id"): int,
                 vol.Optional("scene_param"): int,
@@ -80,17 +80,17 @@ async def async_setup_entry(
     )
     platform.async_register_entity_service(
         SERVICE_SET_MUSIC_MODE,
-        vol.Schema({vol.Required("mode"): vol.Any(int, str)}),
+        cv.make_entity_service_schema({vol.Required("mode"): vol.Any(int, str)}),
         "async_handle_set_music_mode",
     )
     platform.async_register_entity_service(
         SERVICE_SET_MUSIC_SENSITIVITY,
-        vol.Schema({vol.Required("value"): vol.All(int, vol.Range(min=0, max=100))}),
+        cv.make_entity_service_schema({vol.Required("value"): vol.All(int, vol.Range(min=0, max=100))}),
         "async_handle_set_music_sensitivity",
     )
     platform.async_register_entity_service(
         SERVICE_SET_SCHEDULE,
-        vol.Schema(
+        cv.make_entity_service_schema(
             {
                 vol.Required("on_enabled"): bool,
                 vol.Required("on_hour"): vol.All(int, vol.Range(min=0, max=23)),
