@@ -16,7 +16,7 @@ from homeassistant.const import CONF_MAC, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import service, entity_platform
 import homeassistant.helpers.config_validation as cv
-from homeassistant.util.dt import WEEKDAYS
+from homeassistant.const import WEEKDAYS
 import voluptuous as vol
 
 from bleak_retry_connector import establish_connection, BleakClientWithServiceCache
@@ -48,6 +48,7 @@ async def async_setup_entry(
     async_add_entities,
 ):
     """Set up the Sunset Light platform."""
+    _LOGGER.info("async_setup_entry data=%s", config_entry.data)
     mac_address = config_entry.data[CONF_MAC]
     profile_key = config_entry.data.get(CONF_PROFILE, DEFAULT_PROFILE)
     light = SunsetLight(mac_address, "Sunset Light", hass, profile_key)
@@ -169,6 +170,7 @@ class SunsetLight(LightEntity):
 
         device = bluetooth.async_ble_device_from_address(self._hass, self._mac, connectable=True)
         if not device:
+            _LOGGER.error("Device %s not found via bluetooth registry", self._mac)
             raise Exception(f"Device {self._mac} not found")
 
         self._client = await establish_connection(
