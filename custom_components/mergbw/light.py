@@ -151,6 +151,7 @@ class MeRGBWLight(LightEntity):
         self._availability_timeout = availability_timeout
         self._availability_unsub = None
         self._ble_unsub = None
+        self._saw_advertisement = False
 
     def _set_available(self, available: bool):
         """Update availability and push state if it changed."""
@@ -249,10 +250,11 @@ class MeRGBWLight(LightEntity):
         if service_info.address != self._mac:
             return
         self._last_seen = dt_util.utcnow()
+        self._saw_advertisement = True
         self._set_available(True)
 
     def _async_check_availability(self, _now):
-        if self._last_seen is None:
+        if not self._saw_advertisement or self._last_seen is None:
             return
         if (dt_util.utcnow() - self._last_seen).total_seconds() > self._availability_timeout:
             self._set_available(False)
@@ -281,6 +283,7 @@ class MeRGBWLight(LightEntity):
             self.async_on_remove(self._ble_unsub)
         if self._availability_unsub:
             self.async_on_remove(self._availability_unsub)
+        self.async_write_ha_state()
 
     async def _async_handle_hass_stop(self, _event):
         """Disconnect cleanly when HA stops."""
