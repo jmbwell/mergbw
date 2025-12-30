@@ -107,9 +107,18 @@ set_schedule:
           mode: box
     on_days_mask:
       name: On days mask
-      description: Bitmask 0-127 or list of weekdays.
+      description: Select weekdays.
       selector:
-        text:
+        select:
+          multiple: true
+          options:
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            - Sunday
     off_enabled:
       name: Off enabled
       selector:
@@ -130,6 +139,15 @@ set_schedule:
           mode: box
     off_days_mask:
       name: Off days mask
-      description: Bitmask 0-127 or list of weekdays.
+      description: Select weekdays.
       selector:
-        text:
+        select:
+          multiple: true
+          options:
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            - Sunday

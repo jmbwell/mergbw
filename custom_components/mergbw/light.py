@@ -337,7 +337,12 @@ class MeRGBWLight(LightEntity):
                 return value
             mask = 0
             for day in value:
-                idx = self._weekday_index.get(day)
+                if not isinstance(day, str):
+                    continue
+                key = day.strip().lower()
+                if len(key) > 3:
+                    key = key[:3]
+                idx = self._weekday_index.get(key)
                 if idx is not None:
                     mask |= 1 << idx
             return mask
