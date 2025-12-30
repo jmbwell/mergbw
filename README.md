@@ -2,7 +2,8 @@
 
 Home Assistant integration for MeRGBW Bluetooth LE lights (Hexagon Light and Sunset Light).
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-blue.svg)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Bluetooth-lightgrey)](https://www.home-assistant.io/integrations/bluetooth/)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-blue.svg)](https://hacs.xyz/) [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Bluetooth-lightgrey)](https://www.home-assistant.io/integrations/bluetooth/) [![HA integration usage](https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.mergbw.total)](https://analytics.home-assistant.io/custom_integrations.json)
+
 
 ## Contents
 - [Features](#features)
@@ -29,6 +30,10 @@ There are many devices available that seem to work with an app called **MeRGBW**
 
 This integration supports adding more variants. This document includes some notes for developers to get started.
 
+<img src="screenshots/example-device.png" alt="Example MeRGBW device" style="max-width: 260px; width: 100%; height: auto;" />
+
+Above: Example of a supported device.
+
 ## Requirements
 - Home Assistant with Bluetooth enabled and the host in range of the light.
 - The Bluetooth MAC address of your light (if discovery does not find it).
@@ -52,6 +57,11 @@ This integration supports adding more variants. This document includes some note
 2. If discovered, select the device by name/MAC. The profile is auto-guessed; override it if needed.
 3. Or choose **Manual entry**, provide the Bluetooth MAC, and pick a profile.
 4. Submit to create the entry. A light entity is created; Hexagon-only services become available under the `light` domain.
+
+## Screenshots
+<img src="screenshots/screenshot-02-config-device.png" alt="Config flow: device selection" style="max-width: 420px; width: 100%; height: auto;" />
+<img src="screenshots/screenshot-01-config-mac-profile.png" alt="Config flow: manual entry and profile" style="max-width: 420px; width: 100%; height: auto;" />
+<img src="screenshots/screenshot-03-controls.png" alt="Light controls" style="max-width: 420px; width: 100%; height: auto;" />
 
 ## Usage
 After setup you get a standard HA light entity: on/off, brightness, color, and `effect` follow the selected profile’s command format. For Hexagon devices, additional entity services are available (examples below).
