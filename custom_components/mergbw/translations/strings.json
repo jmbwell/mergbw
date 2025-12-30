@@ -11,9 +11,14 @@
         "title": "Connect to MeRGBW",
         "description": "Choose a discovered device or select \"Manual entry\" and enter the Bluetooth MAC address and profile.",
         "data": {
-          "device": "Device",
+          "device_source": "Device",
           "mac": "Bluetooth MAC address",
           "profile": "Profile"
+        },
+        "data_description": {
+          "device_source": "Pick a discovered device or choose Manual entry.",
+          "mac": "Only needed when using Manual entry.",
+          "profile": "Device type to use for this light."
         }
       }
     }
