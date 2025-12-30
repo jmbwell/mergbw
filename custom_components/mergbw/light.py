@@ -17,6 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_platform
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import WEEKDAYS
+from homeassistant.exceptions import HomeAssistantError
 import voluptuous as vol
 from homeassistant.helpers.event import async_call_later
 
@@ -138,6 +139,13 @@ class MeRGBWLight(LightEntity):
         self._weekday_index = {day: idx for idx, day in enumerate(WEEKDAYS)}
         self._attr_available = True
 
+    def _set_available(self, available: bool):
+        """Update availability and push state if it changed."""
+        if self._attr_available == available:
+            return
+        self._attr_available = available
+        self.async_write_ha_state()
+
     @property
     def unique_id(self):
         """Return a unique ID."""
@@ -182,30 +190,38 @@ class MeRGBWLight(LightEntity):
     async def _ensure_connected(self):
         """Ensure the BleakClient is connected."""
         if self._client and self._client.is_connected:
+            self._set_available(True)
             return self._client
 
         device = bluetooth.async_ble_device_from_address(self._hass, self._mac, connectable=True)
         if not device:
             _LOGGER.error("Device %s not found via bluetooth registry", self._mac)
-            raise Exception(f"Device {self._mac} not found")
+            self._set_available(False)
+            raise HomeAssistantError(f"Device {self._mac} not found")
 
-        self._client = await establish_connection(
-            BleakClientWithServiceCache,
-            device,
-            self._mac,
-            disconnected_callback=self._on_disconnected,
-        )
+        try:
+            self._client = await establish_connection(
+                BleakClientWithServiceCache,
+                device,
+                self._mac,
+                disconnected_callback=self._on_disconnected,
+            )
+        except Exception as err:
+            _LOGGER.warning("Failed to connect to %s: %s", self._mac, err)
+            self._set_available(False)
+            raise HomeAssistantError(f"Failed to connect to {self._mac}") from err
+
+        self._set_available(True)
         return self._client
 
     def _on_disconnected(self, client):
         """Handle disconnection."""
         _LOGGER.info("Disconnected from %s", self._mac)
         self._client = None
+        self._set_available(False)
         if self._disconnect_timer:
             self._disconnect_timer()
             self._disconnect_timer = None
-        if self._hass:
-            self._hass.async_create_task(self.async_write_ha_state())
 
     async def async_will_remove_from_hass(self):
         """Disconnect when removed."""
@@ -291,6 +307,9 @@ class MeRGBWLight(LightEntity):
 
     async def async_handle_set_scene(self, scene_name: str):
         """Handle the set_scene service call."""
+        packets = self._profile.build_scene(scene_name)
+        if not packets:
+            raise HomeAssistantError(f"Scene '{scene_name}' is not supported by this profile.")
         await self._run_with_client(lambda client: control.set_scene(client, self._profile, scene_name))
         self._effect = scene_name
         self.async_write_ha_state()
@@ -306,6 +325,8 @@ class MeRGBWLight(LightEntity):
 
     async def async_handle_set_scene_id(self, scene_id: int, scene_param: int | None = None):
         """Set scene by numeric ID (Hexagon-only)."""
+        if not hasattr(self._profile, "build_scene_by_id"):
+            raise HomeAssistantError("Scene ID is not supported by this profile.")
         await self._run_with_client(
             lambda client: control.set_scene_id(client, self._profile, scene_id, scene_param)
         )
@@ -314,10 +335,14 @@ class MeRGBWLight(LightEntity):
 
     async def async_handle_set_music_mode(self, mode):
         """Set music mode (Hexagon-only)."""
+        if not hasattr(self._profile, "build_music_mode"):
+            raise HomeAssistantError("Music mode is not supported by this profile.")
         await self._run_with_client(lambda client: control.set_music_mode(client, self._profile, mode))
 
     async def async_handle_set_music_sensitivity(self, value: int):
         """Set music sensitivity 0-100 (Hexagon-only)."""
+        if not hasattr(self._profile, "build_music_sensitivity"):
+            raise HomeAssistantError("Music sensitivity is not supported by this profile.")
         await self._run_with_client(lambda client: control.set_music_sensitivity(client, self._profile, value))
 
     async def async_handle_set_schedule(
@@ -332,6 +357,8 @@ class MeRGBWLight(LightEntity):
         off_days_mask,
     ):
         """Set combined on/off schedule (Hexagon-only)."""
+        if not hasattr(self._profile, "build_schedule"):
+            raise HomeAssistantError("Schedules are not supported by this profile.")
         def mask_from(value):
             if isinstance(value, int):
                 return value
